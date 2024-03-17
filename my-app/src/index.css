@@ -15,16 +15,21 @@ body,
 }
 
 /* Track */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
 ::-webkit-scrollbar-track {
-  background: #e0e0e0;
+  background: #7a7f9d;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: #21295c;
 }
 
-/* Handle on hover / hover over scroll bar*/
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
+/* Handle on Hover */
+/* ::-webkit-scrollbar-track:hover {
+  background: #21295c;
+} */

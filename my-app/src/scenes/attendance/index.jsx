@@ -1,3 +1,5 @@
+import Sidebar from "../global/Sidebar";
+import Topbar from "../global/Topbar";
 import { Box, IconButton, Button, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import InputBase from "@mui/material/InputBase";
@@ -7,31 +9,45 @@ import axios from 'axios';
 import { useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { tokens } from "../../theme";
+import DataGridCustomToolbar from "../../components/DataGridCustomToolbar";
 
 const Attendance = () => {
-    // eslint-disable-next-line
+     // eslint-disable-next-line
     const { id: _ } = useParams();
     const [data, setData] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
+    const [isSidebar, setIsSidebar] = useState(true);
+
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
+
     const filteredData = data.filter((item) =>
         item.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
 
     useEffect(() => {
         fetchData();
     }, []);
 
+    // eslint-disable-next-line
+    const isMembershipActive = (registrationDateString) => {
+        const [day, month, year] = registrationDateString.split('/').map(Number);
+        const registrationDate = new Date(year, month - 1, day);
+        const currentDate = new Date();
+        const expirationDate = new Date(registrationDate);
+        expirationDate.setMonth(expirationDate.getMonth() + 1); // Add one month
+    
+        return currentDate <= expirationDate;
+      };
+    
     const fetchData = async () => {
         try {
             const response = await axios.get("http://localhost:3001/member");
-            const dataWithIds = response.data.map(item => ({ ...item, id: item._id }));
-            setData(dataWithIds);
+            // Assume the response now includes checkInTimestamp, checkOutTimestamp, and isCheckedIn fields
+            setData(response.data.map(item => ({ ...item, id: item._id })));
         } catch (error) {
             console.error("Axios Error:", error);
         }
@@ -39,17 +55,18 @@ const Attendance = () => {
 
     const handleCheckInOut = async (memberId, action) => {
         try {
-            let time = '';
-            if (action === 'checkin') {
-                time = new Date().toLocaleTimeString();
-            }
-            const response = await axios.post(`http://localhost:3001/attendance/${action}`, { memberId, time });
+            const time = new Date();
+            const response = await axios.post(`http://localhost:3001/attendance/${action}`, { memberId, time: time.toISOString() });
             console.log("Check-in/out response:", response.data);
-            
-            // Update the state with the new check-in time for the corresponding row
+
+            // Update the state to reflect check-in/out changes including setting timestamp and status
             setData(prevData => prevData.map(item => {
                 if (item.id === memberId) {
-                    return { ...item, timestamp: action === 'checkin' ? time : '' };
+                    if (action === 'checkin') {
+                        return { ...item, checkInTimestamp: time, isCheckedIn: true };
+                    } else {
+                        return { ...item, checkOutTimestamp: time, isCheckedIn: false };
+                    }
                 }
                 return item;
             }));
@@ -61,22 +78,14 @@ const Attendance = () => {
     const columns = [
         { field: "fullname", headerName: "Full Name", flex: 1 },
         { field: "username", headerName: "Username", flex: 1 },
-        { field: "plan", headerName: "Plan", flex: 1 },
-        // {
-        //     field: "timestamp",
-        //     headerName: "Check In Time",
-        //     flex: 1,
-        //     renderCell: (params) => (
-        //         <span>{params.value}</span>
-        //     ),
-        // },
+        { field: "dor", headerName: "Date of Last Payment", flex: 1 },
         {
             field: "action",
             headerName: "Action",
             flex: 1,
             renderCell: (params) => (
                 <Box>
-                    {params.row.timestamp ? (
+                    {params.row.isCheckedIn ? (
                         <Button onClick={() => handleCheckInOut(params.row.id, 'checkout')} color="primary" variant="contained">
                             Check Out
                         </Button>
@@ -92,13 +101,20 @@ const Attendance = () => {
 
 
     return (
-        <Box m="20px">
-            <Header title="Registered Members" subtitle="All Gym Members" />
+            <>
+        <Box display="flex" minHeight="100vh"> 
+        <Sidebar isSidebar={isSidebar} />
+        <Box flexGrow={2} display="flex" flexDirection="column" > 
+        <Topbar setIsSidebar={setIsSidebar} />
+        <Box m="10px">
+            <Header title="Attendance Tracker" subtitle="for Registered Members" />
             <Box
                 display="flex"
                 alignItems="center"
                 justifyContent="space-between"
                 borderRadius="3px"
+                mb="-30px"
+                mt="8px"
             >
                 {/* SEARCH BAR */}
                 <Box
@@ -121,7 +137,7 @@ const Attendance = () => {
 
             <Box
                 m="10px 0 0 0"
-                height="75vh"
+                height="78vh"
                 sx={{
                     "& .MuiDataGrid-root": {
                         border: "none",
@@ -148,9 +164,12 @@ const Attendance = () => {
                     },
                 }}
             >
-                <DataGrid rows={filteredData} columns={columns} />
+                <DataGrid rows={filteredData} columns={columns} components={{ Toolbar: DataGridCustomToolbar }} />
             </Box>
         </Box>
+        </Box>
+    </Box>
+    </>
     );
 };
 

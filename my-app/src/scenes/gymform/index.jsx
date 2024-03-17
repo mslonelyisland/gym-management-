@@ -6,25 +6,33 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-// import { Select, MenuItem } from "@mui/material";
+import Sidebar from "../global/Sidebar";
+import Topbar from "../global/Topbar";
 
 const AddEquipment = () => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
     const navigate = useNavigate();
     const [ setError] = useState(null);
-    
+    const [isSidebar, setIsSidebar] = useState(true);
+
       const handleSubmit = async (values) => {
         try {
           // Make HTTP POST request to the server endpoint to register a member
           const response = await axios.post("http://localhost:3001/addgymequipments", values);
-          console.log(response.data); // Log the response data
-          navigate("/managegymequipments"); // Redirect to the registered member page after successful registration
+          console.log(response.data);
+          navigate("/managegymequipments");
         } catch (err) {
           setError(err.message);
         }
       };
   return (
-    <Box m="20px">
+    <>
+    <Box display="flex" minHeight="100vh"> 
+    <Sidebar isSidebar={isSidebar} />
+    <Box flexGrow={2} display="flex" flexDirection="column" > 
+    <Topbar setIsSidebar={setIsSidebar} />
+
+    <Box m="10px">
       <Header title="ADD" subtitle="New Equipments" />
 
       <Formik
@@ -126,6 +134,9 @@ const AddEquipment = () => {
         )}
       </Formik>
     </Box>
+    </Box>
+    </Box>
+    </>
   );
 };
 

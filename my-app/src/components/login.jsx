@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
 // import axios from "axios";
+import bcrypt from "bcryptjs"; // Import bcrypt library for password hashing
 
 function Copyright(props) {
   return (
@@ -25,7 +26,7 @@ function Copyright(props) {
     >
       {"Copyright © "}
       <Link color="inherit" href="https://mui.com/">
-        GYYYYUMM
+        Gym
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -36,38 +37,36 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function Login() {
+  // State variables to hold email and password values
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  // Define handleSubmit function to handle form submission
   function handleSubmit(e) {
-    e.preventDefault();
-    console.log(email, password);
-    fetch("http://localhost:3001/admin", {
-      method: "POST",
-      crossDomain: true,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "Access-Control-Allow-Origin": "*",
-      },
-      body: JSON.stringify({
-        email,
-        password,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data, "admin");
-        if (data.status === "ok") {
-          alert("login successful");
-          window.localStorage.setItem("token", data.data);
-          window.localStorage.setItem("loggedIn", true);
+    e.preventDefault(); // Prevent default form submission behavior
+
+    // Simulated admin credentials
+    const admin = {
+      email: "weluna@gmail.com",
+      passwordHash: bcrypt.hashSync("admin", 10) // Simulate a hashed password
+    };
+
+    // Check if provided email matches the simulated admin email
+    if (email === admin.email) {
+      // Check if provided password matches the simulated hashed password
+      if (bcrypt.compareSync(password, admin.passwordHash)) {
+        // Successful login
+        alert("Login successful!");
 
           window.location.href = "./dashboard";
-        } else {
-          alert("Wrong Username and Password! Please try again!");
-        }
-      });
+      } else {
+        // Incorrect password
+        alert("Incorrect password. Please try again.");
+      }
+    } else {
+      // Admin email not found
+      alert("Admin email not found. Please check your email.");
+    }
   }
 
   return (
@@ -81,7 +80,7 @@ export default function Login() {
           md={7}
           sx={{
             backgroundImage:
-              "url(https://source.unsplash.com/random?wallpapers)",
+              "url(https://img.freepik.com/free-photo/young-adults-sport-gym-using-kettlebells_23-2149255849.jpg?w=1800&t=st=1710567309~exp=1710567909~hmac=1f8fc10ef974a508a433df9a249b3e835210fbe3c433e5f69f32d4199c93301f)",
             backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
               t.palette.mode === "light"
@@ -151,12 +150,12 @@ export default function Login() {
               <Grid container>
                 <Grid item xs>
                   <Link href="#" variant="body2">
-                    Forgot password?
+                    {/* Forgot password? */}
                   </Link>
                 </Grid>
                 <Grid item>
                   <Link href="#" variant="body2">
-                    {"Don't have an account? Sign Up"}
+                    {/* {"Don't have an account? Sign Up"} */}
                   </Link>
                 </Grid>
               </Grid>

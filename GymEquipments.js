@@ -7,9 +7,9 @@ const GymEquipmentsSchema = new mongoose.Schema({
     quantity: Number,
     amount : Number,
     purchaseddate:{
-        type: String, // Change the type to String
+        type: String,
         default: function() {
-            // Function to format the current time and date
+            // Function to format the time and date
             const now = new Date();
             const day = now.getDate().toString().padStart(2, '0');
             const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-based
@@ -20,6 +20,5 @@ const GymEquipmentsSchema = new mongoose.Schema({
 })
 
 // create the model
-// gymequipments is the database collection , GymEquipments is the name of the mongoose model 
 const GymEquipmentsModel = mongoose.model("GymEquipments", GymEquipmentsSchema, "gymequipments"); 
 module.exports = GymEquipmentsModel;

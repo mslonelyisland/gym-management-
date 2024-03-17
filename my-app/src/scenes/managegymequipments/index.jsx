@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Box, useTheme, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
+import Sidebar from "../global/Sidebar";
+import Topbar from "../global/Topbar";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import EditIcon from "@mui/icons-material/Edit";
@@ -10,6 +12,7 @@ import AddIcon from "@mui/icons-material/Add";
 import Header from "../../components/Header";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import DataGridCustomToolbar from "../../components/DataGridCustomToolbar";
 
 const ManageGymEquipments = () => {
   // eslint-disable-next-line
@@ -17,6 +20,7 @@ const ManageGymEquipments = () => {
   const [data, setData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const [isSidebar, setIsSidebar] = useState(true);
 
   useEffect(() => {
     fetchData();
@@ -90,8 +94,12 @@ const ManageGymEquipments = () => {
   ];
 
   return (
-    // can adjust m for the datatable
-    <Box m="20px">
+    <>
+    <Box display="flex" minHeight="100vh"> 
+    <Sidebar isSidebar={isSidebar} />
+    <Box flexGrow={2} display="flex" flexDirection="column" > 
+    <Topbar setIsSidebar={setIsSidebar} />
+    <Box m="10px">
       <Header
         title="Manage Gym Equipments"
         subtitle="Update Gym Equipments"
@@ -99,15 +107,14 @@ const ManageGymEquipments = () => {
       <Box
         display="flex"
         alignItems="center"
-        justifyContent="space-between"
+        // justifyContent="space-between"
         borderRadius="3px"
+        mb="-30px"
+        mt="8px"
       >
         <Box>
           <IconButton onClick={handleAdd}>
-            {/* <Typography variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}>
-            </Typography> */}
+ 
             <AddIcon />
           </IconButton>
         </Box>
@@ -131,7 +138,7 @@ const ManageGymEquipments = () => {
       </Box>
       <Box
         m="10px 0 0 0"
-        height="75vh"
+        height="78vh"
         sx={{
           "& .MuiDataGrid-root": {
             border: "none",
@@ -158,9 +165,12 @@ const ManageGymEquipments = () => {
           },
         }}
       >
-        <DataGrid rows={filteredData} columns={columns} />
+        <DataGrid rows={filteredData} columns={columns} components={{ Toolbar: DataGridCustomToolbar }} />
       </Box>
     </Box>
+      </Box>
+      </Box>
+      </>
   );
 };
 

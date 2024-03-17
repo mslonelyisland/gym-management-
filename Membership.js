@@ -1,18 +1,24 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema; // Import the Schema object from mongoose
+const Schema = mongoose.Schema;
 
 const MembershipSchema = new Schema({
-    member: {
+    fullname: {
         type: Schema.Types.ObjectId,
         ref: 'RegisteredMember',
         required: true
     },
-    membershipStatus: {
-        type: String,
-        required: true,
-        enum: ['active', 'expired']
-    }
-}, { timestamps: true });
+    username: {
+        type: Schema.Types.ObjectId,
+        ref: 'RegisteredMember',
+        required: true
+    },
+    dor: {
+        type: Schema.Types.ObjectId,
+        ref: 'RegisteredMember',
+        required: true
+    },
+    membershipStatus: String
+})
 
 const MembershipModel = mongoose.model('Membership', MembershipSchema, 'membership');
 

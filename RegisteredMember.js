@@ -7,12 +7,12 @@ const RegisteredMemberSchema = new mongoose.Schema({
     gender: String,
     contactnumber : String,
     dor: {
-        type: String, // Change the type to String
+        type: String,
         default: function() {
             // Function to format the current time and date
             const now = new Date();
             const day = now.getDate().toString().padStart(2, '0');
-            const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-based
+            const month = (now.getMonth() + 1).toString().padStart(2, '0'); 
             const year = now.getFullYear();
             return `${day}/${month}/${year} `;
         }
@@ -20,10 +20,35 @@ const RegisteredMemberSchema = new mongoose.Schema({
     membertype: String,
     plan: String,
     amount: Number,
-    // checkInTimestamp: Date, // Stores the last check-in timestamp
-    // checkOutTimestamp: Date, // Stores the last check-out timestamp (optional)
-    // isCheckedIn: Boolean, // Indicates whether the member is currently checked in (optional)
+    checkInTimestamp: {
+        type: String, 
+        default: function() {
+            const now = new Date();
+            const day = now.getDate().toString().padStart(2, '0');
+            const month = (now.getMonth() + 1).toString().padStart(2, '0'); 
+            const year = now.getFullYear();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        }
+    },
+    checkOutTimestamp:{
+        type: String, 
+        default: function() {
+            const now = new Date();
+            const day = now.getDate().toString().padStart(2, '0');
+            const month = (now.getMonth() + 1).toString().padStart(2, '0'); 
+            const year = now.getFullYear();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+        }
+    },
+    isCheckedIn: Boolean, 
 })
+
 
 // create the model
 // registeredmember is the database collection , RegisteredMember is the name of the mongoose model 

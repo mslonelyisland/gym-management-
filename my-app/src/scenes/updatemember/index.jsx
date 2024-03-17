@@ -1,16 +1,19 @@
 import { Box, Button, TextField, InputLabel, FormControl } from "@mui/material";
 import { Select, MenuItem } from "@mui/material";
 import { Formik } from "formik";
-// import * as yup from "yup";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../../components/Header";
+import Sidebar from "../global/Sidebar";
+import Topbar from "../global/Topbar";
 import React, { useState, useEffect } from "react";
 
 const UpdateRegisteredMembers = () => {
   // eslint-disable-next-line
   const { id } = useParams();
   const navigate = useNavigate();
+  const [isSidebar, setIsSidebar] = useState(true);
+
   const [error, setError] = useState(null);
   const [fullname, setFullname] = useState("");
   const [username, setUsername] = useState("");
@@ -24,7 +27,7 @@ const UpdateRegisteredMembers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (!id) return; // If id is not defined, exit early
+        if (!id) return; 
 
         const response = await axios.get(`http://localhost:3001/member/${id}`);
 
@@ -40,29 +43,26 @@ const UpdateRegisteredMembers = () => {
           amount,
         } = response.data;
 
-        // Format the purchaseddate to match the required format (YYYY-MM-DD)
-        // const formattedDate = new Date(purchaseddate).toISOString().split('T')[0];
-
         setFullname(fullname);
         setUsername(username);
         setGender(gender);
         setContactnumber(contactnumber);
-        setDor(dor); // Set the formatted date in the state
+        setDor(dor); 
         setMembertype(membertype);
         setPlan(plan);
         setAmount(amount);
       } catch (err) {
         console.log("Error fetching gym equipment:", err);
-        setError(err); // Set error state to display error message
+        setError(err); 
       }
     };
 
-    fetchData(); // Call the function to fetch data
+    fetchData(); 
   }, [id]);
 
   const handleUpdate = (e) => {
     e.preventDefault();
-    console.log("ID:", id); // Check if id is in the correct format
+    console.log("ID:", id); 
     axios
       .put(`http://localhost:3001/updatemember/` + id, {
         fullname: fullname,
@@ -82,7 +82,12 @@ const UpdateRegisteredMembers = () => {
   };
 
   return (
-    <Box m="20px">
+    <>
+    <Box display="flex" minHeight="100vh"> 
+    <Sidebar isSidebar={isSidebar} />
+    <Box flexGrow={2} display="flex" flexDirection="column" > 
+    <Topbar setIsSidebar={setIsSidebar} />
+    <Box m="10px">
       <Header title="UPDATE" subtitle="Update Member Information" />
       <Formik
         initialValues={{
@@ -125,17 +130,6 @@ const UpdateRegisteredMembers = () => {
                 name="username"
                 sx={{ gridColumn: "span 4" }}
               />
-              {/* <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Gender"
-                value={gender}
-                onBlur={handleBlur}
-                onChange={(e) => setGender(e.target.value)}
-                name="gender"
-                sx={{ gridColumn: "span 4" }}
-              /> */}
               <FormControl
                 fullWidth
                 variant="filled"
@@ -176,17 +170,6 @@ const UpdateRegisteredMembers = () => {
                 name="dor"
                 sx={{ gridColumn: "span 2" }}
               />
-              {/* <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Member Type"
-                value={membertype}
-                onBlur={handleBlur}
-                onChange={(e) => setMembertype(e.target.value)}
-                name="membertype"
-                sx={{ gridColumn: "span 4" }}
-              /> */}
               <FormControl
                 fullWidth
                 variant="filled"
@@ -225,12 +208,9 @@ const UpdateRegisteredMembers = () => {
                 onBlur={handleBlur}
                 onChange={(e) => setAmount(e.target.value)}
                 name="amount"
-                // error={!!touched.amount && !!errors.amount}
-                // helperText={touched.amount && errors.amount}
                 sx={{ gridColumn: "span 2" }}
               />
 
-              {/* Add other fields similarly */}
             </Box>
             <Box display="flex" justifyContent="end" mt="20px">
               <Button type="submit" color="secondary" variant="contained">
@@ -242,6 +222,9 @@ const UpdateRegisteredMembers = () => {
       </Formik>
       {error && <div>Error: {error.message}</div>}
     </Box>
+    </Box>
+    </Box>
+    </>
   );
 };
 
