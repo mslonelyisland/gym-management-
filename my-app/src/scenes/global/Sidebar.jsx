@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation  } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
@@ -14,17 +14,17 @@ import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlin
 import EventNoteOutlinedIcon from "@mui/icons-material/EventNoteOutlined";
 import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, to, icon }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  
+  const location = useLocation();
+
   return (
     <MenuItem
-      active={selected === title}
+      active={location.pathname === to}
       style={{
         color: colors.grey[100],
       }}
-      onClick={() => setSelected(title)}
       icon={icon}
     >
       <Typography>{title}</Typography>
@@ -33,18 +33,16 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const Sidebar = () => {
+const Sidebar = ({ selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [selected, setSelected] = useState("Dashboard");
 
   return (
     <Box
       sx={{
-        
         "& .pro-sidebar-inner": {
-          background: `${colors.primary[400]} !important`// for lightmode color,
+          background: `${colors.primary[400]} !important`,
         },
         "& .pro-icon-wrapper": {
           backgroundColor: "transparent !important",
@@ -62,7 +60,6 @@ const Sidebar = () => {
     >
       <ProSidebar collapsed={isCollapsed}>
         <Menu iconShape="square">
-          {/* LOGO AND MENU ICON */}
           <MenuItem
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
@@ -88,14 +85,11 @@ const Sidebar = () => {
             )}
           </MenuItem>
 
-          {/* MENU ITEMS */}
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
               title="Dashboard"
               to="/dashboard"
               icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
 
             <Typography
@@ -105,21 +99,12 @@ const Sidebar = () => {
             >
               Members
             </Typography>
-            {/* <Item
-              title="View Members"
-              to="/registeredmember"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
             <Item
               title="Registered Members"
               to="/manageregisteredmembers"
               icon={<ManageAccountsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
-            {/* STATUS AND PAYMENTS */}
+
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -131,11 +116,8 @@ const Sidebar = () => {
               title="Membership Status"
               to="/membership"
               icon={<CardMembershipOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
 
-            {/* ATTENDANCE */}
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -147,18 +129,13 @@ const Sidebar = () => {
               title="Members"
               to="/attendance"
               icon={<EventNoteOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
             <Item
               title="Sessions"
               to="/attendancewalkin"
               icon={<EventNoteOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
 
-            {/* GYM EQUIPMENTS */}
             <Typography
               variant="h6"
               color={colors.grey[300]}
@@ -170,67 +147,27 @@ const Sidebar = () => {
               title="Equipments"
               to="/managegymequipments"
               icon={<FitnessCenterOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
-            {/* <Item
-              title="Manage Equipments"
-              to="/managegymequipments"
-              icon={<FitnessCenterOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
 
-            {/* CHARTS */}
             <Typography
               variant="h6"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-            Pages
+              Pages
             </Typography>
             <Item
               title="Gender Pie Chart"
               to="/genderpiechart"
               icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
             <Item
               title="Member Pie Chart"
               to="/memberpiechart"
               icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
             />
-            <Item
-              title="Line Chart"
-              to="/line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Bar Chart"
-              to="/bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            {/* <Item
-              title="Pie Chart"
-              to="/pie"
-              icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
-            {/* <Item
-              title="Geography Chart"
-              to="/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
+            <Item title="Line Chart" to="/line" icon={<TimelineOutlinedIcon />} />
+            <Item title="Bar Chart" to="/bar" icon={<BarChartOutlinedIcon />} />
           </Box>
         </Menu>
       </ProSidebar>

@@ -9,12 +9,14 @@ const BarChart = ({ isDashboard = false }) => {
   const colors = tokens(theme.palette.mode);
   const [monthlyData, setMonthlyData] = useState([]);
 
- useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get("http://localhost:3001/monthlysales");
         // Sort the data based on the month before setting it in the state
-        const sortedData = response.data.sort((a, b) => a._id.month - b._id.month);
+        const sortedData = response.data.sort(
+          (a, b) => a._id.month - b._id.month
+        );
         setMonthlyData(response.data);
       } catch (error) {
         console.error(error);
@@ -23,10 +25,20 @@ const BarChart = ({ isDashboard = false }) => {
 
     fetchData();
   }, []);
-  
+
   const monthNames = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   return (
@@ -68,9 +80,8 @@ const BarChart = ({ isDashboard = false }) => {
       }}
       keys={["totalSales"]}
       indexBy="_id.month"
-      margin={{ top: 30, right: 100, bottom: 30, left: 60 }}
+      margin={{ top: 30, right: 100, bottom: 50, left: 60 }}
       padding={0.3}
-      
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
       colors={{ scheme: "nivo" }}
@@ -107,7 +118,7 @@ const BarChart = ({ isDashboard = false }) => {
         legend: isDashboard ? undefined : "Month", // changed
         legendPosition: "middle",
         legendOffset: 32,
-        format: (value) => monthNames[value - 1] // Map month value to month name
+        format: (value) => monthNames[value - 1], // Map month value to month name
       }}
       axisLeft={{
         tickSize: 5,
@@ -150,13 +161,12 @@ const BarChart = ({ isDashboard = false }) => {
         },
       ]}
       role="application"
-    //   barAriaLabel={function (e) {
-    //     return e.id + ": " + e.formattedValue + " in country: " + e.indexValue;
-    //   }}
-    barAriaLabel={(e) => `${e.indexValue}: ${e.value} total sales`}
+      //   barAriaLabel={function (e) {
+      //     return e.id + ": " + e.formattedValue + " in country: " + e.indexValue;
+      //   }}
+      barAriaLabel={(e) => `${e.indexValue}: ${e.value} total sales`}
     />
   );
 };
-
 
 export default BarChart;

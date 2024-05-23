@@ -3,24 +3,23 @@ import axios from "axios";
 import { ResponsiveLine } from "@nivo/line";
 import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
-// import { DatePicker } from "@mui/lab";
 
 const Line = ({ isCustomLineColors = false, isDashboard = false }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [attendanceData, setAttendanceData] = useState([]);
   const [selectedMonth, ] = useState(new Date());
-  const [walkinData, setWalkinData] = useState([]);
+  // const [walkinData, setWalkinData] = useState([]); 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const attendanceResponse = await axios.get(`http://localhost:3001/attendance?month=${selectedMonth.getMonth() + 1}&year=${selectedMonth.getFullYear()}`);
+        const attendanceResponse = await axios.get(`http://localhost:3001/attendanceline?month=${selectedMonth.getMonth() + 1}&year=${selectedMonth.getFullYear()}`);
         setAttendanceData(attendanceResponse.data);
 
-        const walkinResponse = await axios.get(`http://localhost:3001/attendancewalkin?month=${selectedMonth.getMonth() + 1}&year=${selectedMonth.getFullYear()}`);
-        setWalkinData(walkinResponse.data);
-        console.log("Walk-in data:", walkinResponse.data);
+        // const walkinResponse = await axios.get(`http://localhost:3001/attendancewalkin?month=${selectedMonth.getMonth() + 1}&year=${selectedMonth.getFullYear()}`);
+        // setWalkinData(walkinResponse.data);
+        // console.log("Walk-in data:", walkinResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -30,8 +29,8 @@ const Line = ({ isCustomLineColors = false, isDashboard = false }) => {
   }, [selectedMonth]);
 
   const formattedData = useMemo(() => {
-    if (!attendanceData || !walkinData) return [];
-  
+    if (!attendanceData ) return [];
+    // || !walkinData
     // Process attendance data
     const groupedAttendanceData = attendanceData.reduce((acc, entry) => {
       const hour = new Date(entry.timestamp).getHours();
@@ -46,31 +45,31 @@ const Line = ({ isCustomLineColors = false, isDashboard = false }) => {
   
     formattedAttendanceData.sort((a, b) => a.x - b.x);
   
-    // Process walk-in data
-    const groupedWalkinData = walkinData.reduce((acc, entry) => {
-      const hour = new Date(entry.timestamp).getHours();
-      acc[hour] = (acc[hour] || 0) + 1;
-      return acc;
-    }, {});
+    // // Process walk-in data
+    // const groupedWalkinData = walkinData.reduce((acc, entry) => {
+    //   const hour = new Date(entry.timestamp).getHours();
+    //   acc[hour] = (acc[hour] || 0) + 1;
+    //   return acc;
+    // }, {});
   
-    const formattedWalkinData = Object.entries(groupedWalkinData).map(([hour, count]) => ({
-      x: hour,
-      y: count
-    }));
+    // const formattedWalkinData = Object.entries(groupedWalkinData).map(([hour, count]) => ({
+    //   x: hour,
+    //   y: count
+    // }));
 
-    console.log("Grouped walk-in data:", groupedWalkinData);
-    console.log("Formatted walk-in data:", formattedWalkinData);
+    // console.log("Grouped walk-in data:", groupedWalkinData);
+    // console.log("Formatted walk-in data:", formattedWalkinData);
 
   
-    formattedWalkinData.sort((a, b) => a.x - b.x);    
+    // formattedWalkinData.sort((a, b) => a.x - b.x);    
 
 
     return [
       { id: "members", color: theme.palette.secondary.main, data: formattedAttendanceData },
-      { id: "guests", color: theme.palette.primary.main, data: formattedWalkinData },
+      // { id: "guests", color: theme.palette.primary.main, data: formattedWalkinData },
     ];
-  }, [attendanceData, walkinData, theme.palette.secondary.main, theme.palette.primary.main]);
-  
+  }, [attendanceData, theme.palette.secondary.main]);
+  // walkinData, theme.palette.primary.main
   return (
     <>
       <ResponsiveLine

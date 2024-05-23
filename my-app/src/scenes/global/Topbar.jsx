@@ -30,7 +30,7 @@ const Topbar = ({ setIsSidebar, onLogout }) => {
   };
   return (
     // backgroundColor={colors.primary[400]} is added for lightmode
-    <Box display="flex" justifyContent="right" p={2}   > 
+    <Box display="flex" justifyContent="right" p={1.5}   > 
       {/* SEARCH BAR */}
       {/* <Box
         display="flex"

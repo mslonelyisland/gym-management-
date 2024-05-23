@@ -12,7 +12,7 @@ const Bar = () => {
     <Box flexGrow={2} display="flex" flexDirection="column" > 
     <Topbar setIsSidebar={setIsSidebar} />
     <Box m="10px">
-      <Header title="Monthly Sales" subtitle="Total Earnings per month" />
+      <Header title="Monthly Earnings" subtitle="Total Earnings per month" />
       <Box height="75vh">
         <BarChart />
       </Box>

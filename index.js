@@ -6,10 +6,10 @@ const RegisteredMemberModel = require("./RegisteredMember"); // js file
 const GymEquipmentsModel = require("./GymEquipments");
 const AttendanceModel = require("./Attendance");
 // const AdminModel = require("./Admin");
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const WalkInModel = require("./WalkIn");
-const AttendanceWalkInModel = require('./AttendanceWalkIn')
+const AttendanceWalkInModel = require("./AttendanceWalkIn");
 
 const app = express();
 const port = 3001;
@@ -24,30 +24,32 @@ mongoose
   .then((db) => console.log("Db is connected :D"))
   .catch((err) => console.log(err));
 
-  // function to calculate membership status, working
+// function to calculate membership status, working
 const calculateMembershipStatus = (registrationDate) => {
   const registrationDateObj = new Date(registrationDate);
-  const expirationDate = new Date(registrationDateObj.setMonth(registrationDateObj.getMonth() + 1));
+  const expirationDate = new Date(
+    registrationDateObj.setMonth(registrationDateObj.getMonth() + 1)
+  );
   const currentDate = new Date();
-  return currentDate > expirationDate ? 'Expired' : 'Active';
-  };
+  return currentDate > expirationDate ? "Expired" : "Active";
+};
 
 // Admin Login, working
-const admin = {
-  email: "weluna@gmail.com",
-  passwordHash: bcrypt.hashSync("admin", 10) // Simulate a hashed password
-}; 
+// const admin = {
+//   email: "weluna@gmail.com",
+//   passwordHash: bcrypt.hashSync("admin", 10) // Simulate a hashed password
+// };
 
 // Route to get all members' registration and membership status,working
-app.get('/membership', async (req, res) => {
+app.get("/membership", async (req, res) => {
   try {
     const members = await RegisteredMemberModel.find();
 
     if (!members) {
-      return res.status(404).send('Members not found');
+      return res.status(404).send("Members not found");
     }
 
-    const membersWithStatus = members.map(member => ({
+    const membersWithStatus = members.map((member) => ({
       _id: member._id, // Include the ObjectId
       fullname: member.fullname,
       username: member.username,
@@ -59,17 +61,39 @@ app.get('/membership', async (req, res) => {
     res.json(membersWithStatus);
   } catch (error) {
     console.error("Server error:", error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
-// Route to update a member's payment details by ID,working
-app.put('/updatepayment/:id', async (req, res) => {
+// Route to get a member's registration and membership status by ID, working
+app.get("/membership/:id", async (req, res) => {
   try {
-    const { dor, plan } = req.body; 
+    const member = await RegisteredMemberModel.findById(req.params.id);
+
+    if (!member) {
+      return res.status(404).send("Member not found");
+    }
+
+    const membershipStatus = calculateMembershipStatus(member.dor);
+    res.json({
+      _id: member._id,
+      fullname: member.fullname,
+      username: member.username,
+      dor: member.dor,
+      plan: member.plan,
+      membertype: member.membertype,
+      membershipStatus: membershipStatus,
+    });
+  } catch (error) {
+    res.status(500).send("Server error");
+  }
+});
+// Route to update a member's payment details by ID,working
+app.put("/updatepayment/:id", async (req, res) => {
+  try {
+    const { dor, plan } = req.body;
     const member = await RegisteredMemberModel.findById(req.params.id);
     if (!member) {
-      return res.status(404).send('Member not found');
+      return res.status(404).send("Member not found");
     }
     // Update the member's payment details
     member.dor = dor;
@@ -88,34 +112,9 @@ app.put('/updatepayment/:id', async (req, res) => {
     });
   } catch (error) {
     console.error("Server error:", error);
-    res.status(500).send('Server error');
+    res.status(500).send("Server error");
   }
 });
-
-// Route to get a member's registration and membership status by ID, working
-app.get('/membership/:id', async (req, res) => {
-  try {
-    const member = await RegisteredMemberModel.findById(req.params.id);
-
-    if (!member) {
-      return res.status(404).send('Member not found');
-    }
-
-    const membershipStatus = calculateMembershipStatus(member.dor);
-    res.json({
-      _id: member._id, 
-      fullname: member.fullname,
-      username: member.username,
-      dor: member.dor,
-      plan: member.plan,
-      membertype: member.membertype,
-      membershipStatus: membershipStatus,
-    });
-  } catch (error) {
-    res.status(500).send('Server error');
-  }
-});
-
 
 // POST /admin route for login
 app.post("/admin", async (req, res) => {
@@ -127,20 +126,10 @@ app.post("/admin", async (req, res) => {
     const token = jwt.sign({ email: admin.email });
     res.json({ status: "ok", data: token });
   } else {
-    res.status(401).json
-({ status: "error", message: "Invalid email or password" });
-}
-});
-
-// Route to get the attendance, working
-app.get("/attendance", (req, res) => {
-  const id = req.params.id;
-  AttendanceModel.find()
-    .then((memberId) => res.json(memberId)) // registeredmember is from the model
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
-    });
+    res
+      .status(401)
+      .json({ status: "error", message: "Invalid email or password" });
+  }
 });
 
 // Member Registration,working
@@ -148,7 +137,7 @@ app.get("/attendance", (req, res) => {
 app.get("/member", (req, res) => {
   const id = req.params.id;
   RegisteredMemberModel.find()
-    .then((member) => res.json(member)) 
+    .then((member) => res.json(member))
     .catch((err) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
@@ -170,7 +159,6 @@ app.get("/member/:id", (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     });
 });
-
 
 // register a member, working
 app.post("/registermember", (req, res) => {
@@ -211,13 +199,14 @@ app.delete("/deletemember/:id", (req, res) => {
 app.get("/attendance", (req, res) => {
   const id = req.params.id;
   AttendanceModel.find()
-    .then((member) => res.json(member)) 
+    .then((member) => res.json(member))
     .catch((err) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
     });
 });
 
+// for check in check out buttons
 app.post("/attendance/checkin", async (req, res) => {
   try {
     const { memberId } = req.body;
@@ -231,13 +220,13 @@ app.post("/attendance/checkin", async (req, res) => {
       $set: {
         checkInTimestamp: time,
         isCheckedIn: true,
-      }
+      },
     });
     // Create a new attendance record for check-in
     await AttendanceModel.create({
       memberId,
-      action: 'check in',
-      timestamp: time, 
+      action: "check in",
+      timestamp: time,
     });
 
     res.json({ message: "Check-in recorded successfully", memberId, time });
@@ -261,13 +250,13 @@ app.post("/attendance/checkout", async (req, res) => {
       $set: {
         checkOutTimestamp: time,
         isCheckedIn: false,
-      }
+      },
     });
 
     // Create a new attendance record for check-out
     await AttendanceModel.create({
       memberId,
-      action: 'check out',
+      action: "check out",
       timestamp: time,
     });
 
@@ -281,7 +270,7 @@ app.post("/attendance/checkout", async (req, res) => {
 // Gym Equipments, get all gym equipments, working
 app.get("/gymequipments", (req, res) => {
   GymEquipmentsModel.find()
-    .then((gymequipments) => res.json(gymequipments)) 
+    .then((gymequipments) => res.json(gymequipments))
     .catch((err) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
@@ -328,7 +317,7 @@ app.put("/updategymequipments/:id", (req, res) => {
     .catch((err) => res.json(err));
 });
 
-// delete a member, working
+// delete an equipment , working
 app.delete("/deletegymequipments/:id", (req, res) => {
   const id = req.params.id;
   GymEquipmentsModel.findByIdAndDelete(id)
@@ -336,11 +325,10 @@ app.delete("/deletegymequipments/:id", (req, res) => {
     .catch((err) => res.status(500).json({ error: "Internal server error" }));
 });
 
-
 // Walk In, working
 app.get("/walkin", (req, res) => {
   WalkInModel.find()
-    .then((attendance_walkin) => res.json(attendance_walkin)) 
+    .then((attendance_walkin) => res.json(attendance_walkin))
     .catch((err) => {
       console.error(err);
       res.status(500).json({ error: "Internal server error" });
@@ -353,12 +341,12 @@ app.get("/walkin/:id", (req, res) => {
   WalkInModel.findById(id)
     .then((attendance_walkin) => {
       if (!attendance_walkin) {
-        return res.status(404).json({ error: "Equipment not found" });
+        return res.status(404).json({ error: "not found" });
       }
       res.json(attendance_walkin);
     })
     .catch((err) => {
-      console.error("Error retrieving equipment by ID:", err);
+      console.error("Error:", err);
       res.status(500).json({ error: "Internal server error" });
     });
 });
@@ -376,15 +364,6 @@ app.delete("/deletewalkin/:id", (req, res) => {
     .catch((err) => res.status(500).json({ error: "Internal server error" }));
 });
 
-app.get("/attendancewalkin", (req, res) => {
-  AttendanceWalkInModel.find()
-    .then((attendance_walkin) => res.json(attendance_walkin))
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ error: "Internal server error" });
-    });
-});
-
 app.post("/attendance_walkin/checkin", async (req, res) => {
   try {
     const { walkinId } = req.body;
@@ -398,12 +377,12 @@ app.post("/attendance_walkin/checkin", async (req, res) => {
       $set: {
         checkInTimestamp: time,
         isCheckedIn: true,
-      }
+      },
     });
     // Create a new attendance record for the check-in
     await AttendanceWalkInModel.create({
       walkinId,
-      action: 'check in',
+      action: "check in",
       timestamp: time,
     });
 
@@ -427,13 +406,13 @@ app.post("/attendance_walkin/checkout", async (req, res) => {
       $set: {
         checkOutTimestamp: time,
         isCheckedIn: false,
-      }
+      },
     });
     // Create a new attendance record for check-out
     await AttendanceWalkInModel.create({
       walkinId,
-      action: 'check out',
-      timestamp: time, 
+      action: "check out",
+      timestamp: time,
     });
 
     res.json({ message: "Check-out recorded successfully", walkinId, time });
@@ -444,17 +423,60 @@ app.post("/attendance_walkin/checkout", async (req, res) => {
 });
 
 // FOR DATA VISUALIZATION
-// Monthly Sales
+// Line Chart
+app.get("/combinedattendance", async (req, res) => {
+  try {
+    // Fetch data from both collections
+    const attendanceWalkInData = await AttendanceWalkInModel.find({ action: "check in" });
+    const memberData = await AttendanceModel.find({ action: "check in" });
+
+    // Combine the data from both collections
+    const combinedData = {
+      attendance_walkin: attendanceWalkInData,
+      member: memberData
+    };
+
+    // Send the combined data in the response
+    res.json(combinedData);
+  } catch (error) {
+    console.error("Error fetching combined attendance data:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
+// get the check ins , working
+app.get("/attendancewalkin", (req, res) => {
+  AttendanceWalkInModel.find({ action: "check in" }) // check in lang kwaon
+    .then((attendance_walkin) => res.json(attendance_walkin))
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+//attendance check ins, filtering only check-in records
+app.get("/attendanceline", (req, res) => {
+  AttendanceModel.find({ action: 'check in' })
+    .then((member) => res.json(member)) 
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ error: "Internal server error" });
+    });
+});
+
+// Bar Chart
 // Route to fetch monthly sales data, working
-app.get('/monthlysales', async (req, res) => {
+app.get("/monthlysales", async (req, res) => {
   try {
     const monthlyData = await RegisteredMemberModel.aggregate([
       {
         $group: {
-          _id: { month: { $month: { $dateFromString: { dateString: "$dor" } } } },
-          totalSales: { $sum: "$amount" }
-        }
-      }
+          _id: {
+            month: { $month: { $dateFromString: { dateString: "$dor" } } },
+          },
+          totalSales: { $sum: "$amount" },
+        },
+      },
     ]);
     res.json(monthlyData);
   } catch (err) {
@@ -464,65 +486,67 @@ app.get('/monthlysales', async (req, res) => {
 });
 
 // WORKING!!!!!!!!!!!!!!!!!??, march 15 not working
-app.get('/activestatus', async (req, res) => {
-  try {
-    const {memberId} = req.body;
-    const number = await RegisteredMemberModel.find(memberId);
+// app.get('/activestatus', async (req, res) => {
+//   try {
+//     const {memberId} = req.body;
+//     const number = await RegisteredMemberModel.find(memberId);
 
-    await RegisteredMemberModel.findByIdAndUpdate(memberId, {
-      $set: {
-        membershipStatus: calculateMembershipStatus
-      }
-    })
-    
-    // Filter the members who have active membership status
-    const activeMembers = memberId.filter(memberId => memberId.membershipStatus === 'Expired');
+//     await RegisteredMemberModel.findByIdAndUpdate(memberId, {
+//       $set: {
+//         membershipStatus: calculateMembershipStatus
+//       }
+//     })
 
-    // Get the count of active members
-    const count = activeMembers.length;
+//     // Filter the members who have active membership status
+//     const activeMembers = memberId.filter(memberId => memberId.membershipStatus === 'Expired');
 
-    // Return the count of active members
-    res.json({ count });
-  } catch (error) {
-    console.error('Error fetching active members count:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+//     // Get the count of active members
+//     const count = activeMembers.length;
+
+//     // Return the count of active members
+//     res.json({ count });
+//   } catch (error) {
+//     console.error('Error fetching active members count:', error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
 
 // STAT BOX
 // working
-app.get('/activememberscount', async (req, res) => {
+app.get("/activememberscount", async (req, res) => {
   try {
     // Count the number of members where isCheckedIn is true
-    const count = await RegisteredMemberModel.countDocuments({ isCheckedIn: true });
+    const count = await RegisteredMemberModel.countDocuments({
+      isCheckedIn: true,
+    });
     res.json({ count });
   } catch (error) {
-    console.error('Error fetching active members count:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching active members count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 // working
-app.get('/activewalkincount', async (req, res) => {
+app.get("/activewalkincount", async (req, res) => {
   try {
     // Count the number of walkin where action is 'check in'
-    const count = await WalkInModel.countDocuments({ isCheckedIn: 'true' });
+    const count = await WalkInModel.countDocuments({ isCheckedIn: "true" });
     res.json({ count });
   } catch (error) {
-    console.error('Error fetching active walk-in count:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching active walk-in count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// working diay ni siya okay
-app.get('/activememberstatus', async (req, res) => {
+// working diay ni siya 
+app.get("/activememberstatus", async (req, res) => {
   try {
     // Find all members with their membership status
     const members = await RegisteredMemberModel.find();
 
     if (members.length === 0) {
-      return res.status(404).send('Members not found');
+      return res.status(404).send("Members not found");
     }
-    const membersWithStatus = members.map(member => ({
+    const membersWithStatus = members.map((member) => ({
       _id: member._id, // Include the ObjectId kay data grid error
       fullname: member.fullname,
       username: member.username,
@@ -531,9 +555,11 @@ app.get('/activememberstatus', async (req, res) => {
       membertype: member.membertype,
       membershipStatus: calculateMembershipStatus(member.dor),
     }));
-    
+
     // Filter the members who have active membership status
-    const activeMembers = membersWithStatus.filter(member => member.membershipStatus === 'Active');
+    const activeMembers = membersWithStatus.filter(
+      (member) => member.membershipStatus === "Active"
+    );
 
     // Count of active members
     const count = activeMembers.length;
@@ -541,21 +567,21 @@ app.get('/activememberstatus', async (req, res) => {
     // Return the count of active members
     res.json({ count });
   } catch (error) {
-    console.error('Error fetching active members count:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching active members count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
-// working 
-app.get('/expiredmemberstatus', async (req, res) => {
+// working
+app.get("/expiredmemberstatus", async (req, res) => {
   try {
     const members = await RegisteredMemberModel.find();
 
     if (members.length === 0) {
-      return res.status(404).send('Members not found');
+      return res.status(404).send("Members not found");
     }
-    const membersWithStatus = members.map(member => ({
-      _id: member._id, 
+    const membersWithStatus = members.map((member) => ({
+      _id: member._id,
       fullname: member.fullname,
       username: member.username,
       dor: member.dor,
@@ -563,14 +589,16 @@ app.get('/expiredmemberstatus', async (req, res) => {
       membertype: member.membertype,
       membershipStatus: calculateMembershipStatus(member.dor),
     }));
-    
+
     // Filter the members who have active membership status
-    const activeMembers = membersWithStatus.filter(member => member.membershipStatus === 'Expired');
+    const activeMembers = membersWithStatus.filter(
+      (member) => member.membershipStatus === "Expired"
+    );
     const count = activeMembers.length;
     res.json({ count });
   } catch (error) {
-    console.error('Error fetching active members count:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error("Error fetching active members count:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -580,7 +608,7 @@ app.get("/trends", async (req, res) => {
       {
         $group: {
           _id: {
-            month: { $dateToString: { format: "%m", date: "$timestamp" } }
+            month: { $dateToString: { format: "%m", date: "$timestamp" } },
           },
           totalCheckIns: { $sum: 1 },
         },
@@ -593,38 +621,38 @@ app.get("/trends", async (req, res) => {
   }
 });
 // working
-app.get('/genderdata', async (req,res ) => {
+app.get("/genderdata", async (req, res) => {
   try {
     const data = await RegisteredMemberModel.aggregate([
-        {
-            $group: {
-                _id: "$gender",
-                count: { $sum: 1 }
-            }
-        }
+      {
+        $group: {
+          _id: "$gender",
+          count: { $sum: 1 },
+        },
+      },
     ]);
     res.json(data);
-} catch (error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
-}
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 // working
-app.get('/membertypedata', async (req,res ) => {
+app.get("/membertypedata", async (req, res) => {
   try {
     const data = await RegisteredMemberModel.aggregate([
-        {
-            $group: {
-                _id: "$membertype",
-                count: { $sum: 1 }
-            }
-        }
+      {
+        $group: {
+          _id: "$membertype",
+          count: { $sum: 1 },
+        },
+      },
     ]);
     res.json(data);
-} catch (error) {
+  } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
-}
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
 const PORT = 3001;

@@ -26,7 +26,7 @@ function Copyright(props) {
     >
       {"Copyright © "}
       <Link color="inherit" href="https://mui.com/">
-        Gym
+        FitLab Gym
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -37,25 +37,19 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function Login() {
-  // State variables to hold email and password values
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // Define handleSubmit function to handle form submission
   function handleSubmit(e) {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault(); 
 
-    // Simulated admin credentials
     const admin = {
       email: "weluna@gmail.com",
       passwordHash: bcrypt.hashSync("admin", 10) // Simulate a hashed password
     };
 
-    // Check if provided email matches the simulated admin email
     if (email === admin.email) {
-      // Check if provided password matches the simulated hashed password
       if (bcrypt.compareSync(password, admin.passwordHash)) {
-        // Successful login
         alert("Login successful!");
 
           window.location.href = "./dashboard";
