@@ -5,10 +5,14 @@ import { Link, useLocation  } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import FitnessCenterOutlinedIcon from "@mui/icons-material/FitnessCenterOutlined";
+import CardMembershipOutlinedIcon from "@mui/icons-material/CardMembershipOutlined";
 import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
+import EventNoteOutlinedIcon from "@mui/icons-material/EventNoteOutlined";
+import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 
 const Item = ({ title, to, icon }) => {
   const theme = useTheme();
@@ -72,7 +76,7 @@ const Sidebar = ({ selected, setSelected }) => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  Home Owner
+                  ADMIN
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -93,7 +97,7 @@ const Sidebar = ({ selected, setSelected }) => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
-              Tables
+              Members
             </Typography>
             <Item
               title="Registered Members"
@@ -106,8 +110,62 @@ const Sidebar = ({ selected, setSelected }) => {
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
             >
+              Status
+            </Typography>
+            <Item
+              title="Membership Status"
+              to="/membership"
+              icon={<CardMembershipOutlinedIcon />}
+            />
+
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+            >
+              Check In/Out
+            </Typography>
+            <Item
+              title="Members"
+              to="/attendance"
+              icon={<EventNoteOutlinedIcon />}
+            />
+            <Item
+              title="Sessions"
+              to="/attendancewalkin"
+              icon={<EventNoteOutlinedIcon />}
+            />
+
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+            >
+              Equipment
+            </Typography>
+            <Item
+              title="Equipments"
+              to="/managegymequipments"
+              icon={<FitnessCenterOutlinedIcon />}
+            />
+
+            <Typography
+              variant="h6"
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px" }}
+            >
               Pages
             </Typography>
+            <Item
+              title="Gender Pie Chart"
+              to="/genderpiechart"
+              icon={<PieChartOutlineOutlinedIcon />}
+            />
+            <Item
+              title="Member Pie Chart"
+              to="/memberpiechart"
+              icon={<PieChartOutlineOutlinedIcon />}
+            />
             <Item title="Line Chart" to="/line" icon={<TimelineOutlinedIcon />} />
             <Item title="Bar Chart" to="/bar" icon={<BarChartOutlinedIcon />} />
           </Box>

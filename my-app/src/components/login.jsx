@@ -26,7 +26,7 @@ function Copyright(props) {
     >
       {"Copyright © "}
       <Link color="inherit" href="https://mui.com/">
-        FitLab Gym
+        Smart Home Control
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -74,7 +74,7 @@ export default function Login() {
           md={7}
           sx={{
             backgroundImage:
-              "url(https://img.freepik.com/free-photo/young-adults-sport-gym-using-kettlebells_23-2149255849.jpg?w=1800&t=st=1710567309~exp=1710567909~hmac=1f8fc10ef974a508a433df9a249b3e835210fbe3c433e5f69f32d4199c93301f)",
+              "url(https://images.ctfassets.net/16nm6vz43ids/1vJJWbgjKXrBxPvb2Kw0rf/ee032b59fd3b26a34c4d89c5ffa5bf46/Smart_home_security_systems_buying_guide.png)",
             backgroundRepeat: "no-repeat",
             backgroundColor: (t) =>
               t.palette.mode === "light"
